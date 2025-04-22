@@ -156,8 +156,7 @@ const audioService = {
     try {
       const response = await axios.post(CONFIG.API_ENDPOINT, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'x-api-key': CONFIG.API_KEY
+          'Content-Type': 'multipart/form-data'
         }
       });
       
