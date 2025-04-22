@@ -146,22 +146,42 @@ const audioService = {
     }
   },
 
+  blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  },
+
+
   identifyBird: async (oggBlob) => {
     
     // Create a short preview URL to verify the audio blob is valid
     const previewUrl = URL.createObjectURL(oggBlob);
     console.log('Audio preview URL:', previewUrl);
-    
-    const formData = new FormData();
-    formData.append('audio', oggBlob, 'recording.ogg');
+
+    const audioBase64 = await blobToBase64(oggBlob)
+
+    const payload = {
+      filename: 'recording.ogg', 
+      contentType: oggBlob.type || 'audio/ogg', 
+      audio_base64: audioBase64 
+    };
     
     try {
-      const response = await axios.post(CONFIG.API_ENDPOINT, formData, {
+
+      const response = await axios.post(CONFIG.API_ENDPOINT, payload, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
-      
+      console.log('API response:', response);
       return response.data;
     } 
     catch (error) {
