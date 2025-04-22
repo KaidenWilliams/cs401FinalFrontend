@@ -29,6 +29,15 @@ This application uses modern web technologies and is compatible with:
 
 Some older browsers may not support all features, particularly the audio conversion functionality.
 
+## Deployment
+
+This application is configured for easy deployment to GitHub Pages:
+
+1. The repository is set up to use GitHub Actions for automatic deployment
+2. You can manually deploy by running `npm run deploy`
+
+The live version can be accessed at: https://KaidenWilliams.github.io/cs401FinalFrontend
+
 ## Development Notes
 
 - The application uses FFmpeg compiled to WebAssembly to handle audio conversion on the client-side

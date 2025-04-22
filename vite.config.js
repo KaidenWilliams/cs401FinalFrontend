@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -12,7 +13,8 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@ffmpeg/ffmpeg', '@ffmpeg/util'],
   },
-  base: './',
+  // Using conditional base path - empty for dev, repo name for production
+  base: process.env.NODE_ENV === 'production' ? '/cs401FinalFrontend/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',

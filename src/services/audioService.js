@@ -19,14 +19,16 @@ const audioService = {
     if (!ffmpegLoadPromise) {
       ffmpegLoadPromise = (async () => {
         try {
-          // Get the base URL for the current page
-          const baseURL = window.location.origin;
+          // Get the base URL for the current page from Vite's import.meta.env.BASE_URL
+          // This will be '/' in development and '/cs401FinalFrontend/' in production
+          const baseURL = import.meta.env.BASE_URL || '/';
           
+          // In Vite, we need to access files in the public folder via root path
           await ffmpeg.load({
-            // Instead of importing directly, construct complete URLs to the public files
-            coreURL: `${baseURL}/ffmpeg/ffmpeg-core.js`,
-            wasmURL: `${baseURL}/ffmpeg/ffmpeg-core.wasm`,
-            workerURL: `${baseURL}/ffmpeg/ffmpeg-core.worker.js`
+            // Use absolute paths from the root instead of importing
+            coreURL: new URL(`${baseURL}ffmpeg/ffmpeg-core.js`, window.location.href).href,
+            wasmURL: new URL(`${baseURL}ffmpeg/ffmpeg-core.wasm`, window.location.href).href,
+            workerURL: new URL(`${baseURL}ffmpeg/ffmpeg-core.worker.js`, window.location.href).href
           });
           
           ffmpegLoaded = true;
@@ -168,6 +170,7 @@ const audioService = {
       // Provide mock data for development/fallback
       return {
         species: [
+          { name: "TEST DATA", confidence: 1.00 },
           { name: "Northern Cardinal", confidence: 0.92 },
           { name: "American Robin", confidence: 0.65 },
           { name: "Blue Jay", confidence: 0.43 }
