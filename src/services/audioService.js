@@ -9,25 +9,22 @@ const ffmpeg = new FFmpeg();
 let ffmpegLoaded = false;
 let ffmpegLoadPromise = null;
 
-
-const blobToBase64 = (blob) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result.split(',')[1];
-      resolve(base64String);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-    
-  });
-};
-
-
 /**
  * Service for handling audio processing and API communication
  */
 const audioService = {
+  // Convert a Blob to Base64 string
+  blobToBase64: (blob) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  },
   
   _loadFFmpeg: async () => {
     // Only load once and reuse the promise to prevent multiple loading attempts
@@ -163,12 +160,12 @@ const audioService = {
 
 
   identifyBird: async (oggBlob) => {
-    
     // Create a short preview URL to verify the audio blob is valid
     const previewUrl = URL.createObjectURL(oggBlob);
     console.log('Audio preview URL:', previewUrl);
 
-    const audioBase64 = await blobToBase64(oggBlob)
+    // Convert the blob to base64 string
+    const audioBase64 = await audioService.blobToBase64(oggBlob);
 
     const payload = {
       filename: 'recording.ogg', 
