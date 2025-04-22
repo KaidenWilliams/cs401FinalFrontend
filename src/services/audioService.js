@@ -19,6 +19,7 @@ const blobToBase64 = (blob) => {
     };
     reader.onerror = reject;
     reader.readAsDataURL(blob);
+    
   });
 };
 
