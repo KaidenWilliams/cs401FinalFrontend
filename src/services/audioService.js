@@ -9,6 +9,20 @@ const ffmpeg = new FFmpeg();
 let ffmpegLoaded = false;
 let ffmpegLoadPromise = null;
 
+
+const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result.split(',')[1];
+      resolve(base64String);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+
 /**
  * Service for handling audio processing and API communication
  */
@@ -144,19 +158,6 @@ const audioService = {
       console.error('Error converting audio:', error);
       throw new Error('Failed to convert audio format');
     }
-  },
-
-  blobToBase64(blob) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-
-        const base64String = reader.result.split(',')[1];
-        resolve(base64String);
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
   },
 
 
