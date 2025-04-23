@@ -161,6 +161,7 @@ const audioService = {
     }
   },
 
+
   identifyBird: async (oggBlob) => {
     // Create a short preview URL to verify the audio blob is valid
     const previewUrl = URL.createObjectURL(oggBlob);
@@ -181,30 +182,42 @@ const audioService = {
           'Content-Type': 'application/json'
         }
       });
+      console.log('API response:', response);
 
-      console.log("response", response);
-      
-      const responseData = response.data[0];
-
-      
-      // If we have top5_labels and top5_probs, format the results
-      if (responseData && responseData.top5_labels && responseData.top5_probs && Array.isArray(responseData.top5_labels) && Array.isArray(responseData.top5_probs)) 
-      { 
-        const formattedResults = responseData.top5_labels.map((label, index) => ({
-          name: label,
-          confidence: responseData.top5_probs[index]
-        }));
-        
-        return { species: formattedResults };
-      } 
-      else 
-      {
-        console.log('Response does not contain expected data structure:', responseData);
-        return { species: [] };
+      // Handle potential string response by checking type
+      let responseData = response.data;
+      if (typeof responseData === 'string') {
+        try {
+          responseData = JSON.parse(responseData);
+        } catch (parseError) {
+          console.error('Error parsing API response string:', parseError);
+          throw new Error('Invalid response format from API');
+        }
       }
+
+      // Access the data object inside responseData
+      const birdData = responseData.data || responseData;
+      
+      // Extract the top5_labels and top5_probs
+      const { top5_labels, top5_probs } = birdData[0] || {};
+      
+      if (!top5_labels || !top5_probs || !Array.isArray(top5_labels) || !Array.isArray(top5_probs)) {
+        console.error('Unexpected response structure:', responseData);
+        throw new Error('Invalid data structure in API response');
+      }
+
+      // Map the data to the expected format
+      const formattedResults = top5_labels.map((label, index) => ({
+        name: label,
+        confidence: top5_probs[index]
+      }));
+      
+      return { species: formattedResults };
     } 
     catch (error) {
-      console.log('API request issue:', error.message);
+      console.error('API error:', error.response?.data || error.message);
+      
+      // Provide mock data for development/fallback
       return { species: [] };
     }
   }
