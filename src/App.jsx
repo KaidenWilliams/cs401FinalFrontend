@@ -313,7 +313,9 @@ function App() {
             <h2>Potential Bird Species</h2>
             <div className="bird-results">
               {results.species && results.species.length > 0 ? (
-                results.species.map((bird, index) => (
+                results.species
+                  .filter(bird => bird.confidence > 0.1)
+                  .map((bird, index) => (
                   <div key={index} className="bird-result-item">
                     <div className="bird-name">{bird.name}</div>
                     <div className="confidence">
