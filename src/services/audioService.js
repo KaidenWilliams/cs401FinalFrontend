@@ -184,7 +184,10 @@ const audioService = {
         }
       });
       console.log('API response:', response);
-      const formattedResults = response.data.top5_labels.map((label, index) => ({
+
+      const parsedData = JSON.parse(response.data);
+
+      const formattedResults = parsedData.data.top5_labels.map((label, index) => ({
         name: label,
         confidence: response.data.top5_probs[index]
       }));
