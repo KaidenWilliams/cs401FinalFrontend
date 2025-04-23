@@ -5,6 +5,7 @@ import CONFIG from '../config';
 
 // Initialize FFmpeg
 const ffmpeg = new FFmpeg();
+const CHUNK_DURATION = 5; // seconds
 
 let ffmpegLoaded = false;
 let ffmpegLoadPromise = null;
@@ -85,6 +86,7 @@ const audioService = {
           await ffmpeg.exec([
             '-loglevel', 'verbose',
             '-i', inputFileName,
+            '-t', CHUNK_DURATION.toString(),
             '-vn',                 // No video
             '-acodec', 'libvorbis', // Audio codec for OGG
             '-q:a', '4',           // Audio quality
@@ -95,6 +97,7 @@ const audioService = {
           // Standard audio conversion
           await ffmpeg.exec([
             '-loglevel', 'verbose',
+            '-t', CHUNK_DURATION.toString(),
             '-i', inputFileName,
             '-c:a', 'libvorbis', 
             outputFileName
@@ -181,20 +184,17 @@ const audioService = {
         }
       });
       console.log('API response:', response);
-      return response.data;
+      const formattedResults = response.data.top5_labels.map((label, index) => ({
+        name: label,
+        confidence: response.data.top5_probs[index]
+      }));
+      return {species: formattedResults};
     } 
     catch (error) {
       console.error('API error:', error.response?.data || error.message);
       
       // Provide mock data for development/fallback
-      return {
-        species: [
-          { name: "TEST DATA", confidence: 1.00 },
-          { name: "Northern Cardinal", confidence: 0.92 },
-          { name: "American Robin", confidence: 0.65 },
-          { name: "Blue Jay", confidence: 0.43 }
-        ]
-      };
+      return {species: []};
     }
   }
 };
