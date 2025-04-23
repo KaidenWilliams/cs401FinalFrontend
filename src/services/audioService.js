@@ -182,7 +182,7 @@ const audioService = {
         }
       });
       
-      responseData = response.data[0];
+      const responseData = response.data[0];
 
       
       // If we have top5_labels and top5_probs, format the results
