@@ -187,8 +187,7 @@ const audioService = {
       
       // If we have top5_labels and top5_probs, format the results
       if (responseData && responseData.top5_labels && responseData.top5_probs && Array.isArray(responseData.top5_labels) && Array.isArray(responseData.top5_probs)) 
-      {
-        
+      { 
         const formattedResults = responseData.top5_labels.map((label, index) => ({
           name: label,
           confidence: responseData.top5_probs[index]
