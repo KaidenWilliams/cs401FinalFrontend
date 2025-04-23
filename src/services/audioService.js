@@ -177,7 +177,6 @@ const audioService = {
     };
     
     try {
-
       const response = await axios.post(CONFIG.API_ENDPOINT, payload, {
         headers: {
           'Content-Type': 'application/json'
@@ -185,19 +184,41 @@ const audioService = {
       });
       console.log('API response:', response);
 
-      const parsedData = JSON.parse(response.data);
+      // Handle potential string response by checking type
+      let responseData = response.data;
+      if (typeof responseData === 'string') {
+        try {
+          responseData = JSON.parse(responseData);
+        } catch (parseError) {
+          console.error('Error parsing API response string:', parseError);
+          throw new Error('Invalid response format from API');
+        }
+      }
 
-      const formattedResults = parsedData.data.top5_labels.map((label, index) => ({
+      // Access the data object inside responseData
+      const birdData = responseData.data || responseData;
+      
+      // Extract the top5_labels and top5_probs
+      const { top5_labels, top5_probs } = birdData;
+      
+      if (!top5_labels || !top5_probs || !Array.isArray(top5_labels) || !Array.isArray(top5_probs)) {
+        console.error('Unexpected response structure:', responseData);
+        throw new Error('Invalid data structure in API response');
+      }
+
+      // Map the data to the expected format
+      const formattedResults = top5_labels.map((label, index) => ({
         name: label,
-        confidence: response.data.top5_probs[index]
+        confidence: top5_probs[index]
       }));
-      return {species: formattedResults};
+      
+      return { species: formattedResults };
     } 
     catch (error) {
       console.error('API error:', error.response?.data || error.message);
       
       // Provide mock data for development/fallback
-      return {species: []};
+      return { species: [] };
     }
   }
 };
